@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iomanip>
+
 #include <sstream>
 
 namespace
@@ -20,7 +21,8 @@ double ProductIssueEvaluator::Clamp(double value, double minValue, double maxVal
     return std::clamp(value, minValue, maxValue);
 }
 
-std::wstring ProductIssueEvaluator::CalculateGrade(double score)
+
+std::string ProductIssueEvaluator::CalculateGrade(double score)
 {
     if (score >= 90.0)
     {
@@ -30,6 +32,7 @@ std::wstring ProductIssueEvaluator::CalculateGrade(double score)
     if (score >= 75.0)
     {
         return L"B";
+
     }
 
     if (score >= 60.0)
@@ -49,6 +52,7 @@ std::wstring ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& m
     if (metrics.analysisConfidence < 0.4)
     {
         stream << L"Analysis confidence is low, so more photos are recommended.";
+
         return stream.str();
     }
 
@@ -63,6 +67,7 @@ std::wstring ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& m
     else
     {
         stream << L"The overall exterior condition looks good.";
+
     }
 
     return stream.str();

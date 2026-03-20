@@ -39,6 +39,7 @@ namespace
         for (const auto& issue : report.detectedIssues)
         {
             std::wcout << L"- " << issue << L"\n";
+
         }
     }
 
@@ -52,6 +53,7 @@ namespace
             .shapeDeformationSeverity = 0.10,
             .analysisConfidence = 0.88,
             .detectedIssues = {L"Light scratches on the front surface", L"Wear on the lower-right corner"}
+
         };
     }
 }
@@ -66,6 +68,7 @@ int main()
 
     const ProductIssueEvaluator evaluator;
     const ProductScoreReport report = evaluator.Evaluate(metrics);
+
 
     PrintReport(report);
     return 0;
