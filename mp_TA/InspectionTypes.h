@@ -11,8 +11,7 @@ struct ImageInspectionMetrics
     double edgeDamageSeverity = 0.0;
     double shapeDeformationSeverity = 0.0;
     double analysisConfidence = 0.0;
-
-    std::vector<std::wstring> detectedIssues;
+    std::vector<std::string> detectedIssues;
 
 };
 

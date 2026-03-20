@@ -26,47 +26,49 @@ std::string ProductIssueEvaluator::CalculateGrade(double score)
 {
     if (score >= 90.0)
     {
-        return L"A";
+        return "A";
+
     }
 
     if (score >= 75.0)
     {
-        return L"B";
+        return "B";
+
 
     }
 
     if (score >= 60.0)
     {
-        return L"C";
+        return "C";
     }
 
-    return L"D";
+    return "D";
 }
 
-std::wstring ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& metrics, double score)
+std::string ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& metrics, double score)
 {
-    std::wostringstream stream;
+    std::ostringstream stream;
     stream << std::fixed << std::setprecision(1);
-    stream << L"Appearance score: " << score << L". ";
+    stream << "Appearance score: " << score << ". ";
 
     if (metrics.analysisConfidence < 0.4)
     {
-        stream << L"Analysis confidence is low, so more photos are recommended.";
+        stream << "Analysis confidence is low, so more photos are recommended.";
 
         return stream.str();
     }
 
     if (metrics.scratchSeverity >= 0.6 || metrics.edgeDamageSeverity >= 0.6)
     {
-        stream << L"Surface scratches and edge damage are the main reasons for the score reduction.";
+        stream << "Surface scratches and edge damage are the main reasons for the score reduction.";
     }
     else if (metrics.stainSeverity >= 0.5 || metrics.discolorationSeverity >= 0.5)
     {
-        stream << L"Stains or discoloration are the main factors lowering the quality score.";
+        stream << "Stains or discoloration are the main factors lowering the quality score.";
     }
     else
     {
-        stream << L"The overall exterior condition looks good.";
+        stream << "The overall exterior condition looks good.";
 
     }
 

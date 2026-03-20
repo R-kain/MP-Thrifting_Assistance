@@ -2,6 +2,7 @@
 #include <iostream>
 #include <locale>
 
+
 #if defined(_WIN32)
 #include <fcntl.h>
 #include <io.h>
@@ -11,59 +12,50 @@
 
 namespace
 {
-    void InitializeConsole()
-    {
-#if defined(_WIN32)
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        _setmode(_fileno(stderr), _O_U16TEXT);
-#endif
-        std::locale::global(std::locale(""));
-        std::wcout.imbue(std::locale());
-        std::wcerr.imbue(std::locale());
-    }
-
     void PrintReport(const ProductScoreReport& report)
     {
-        std::wcout << L"=== Product Exterior Inspection Report ===\n";
-        std::wcout << L"Final score: " << std::fixed << std::setprecision(1) << report.score << L"\n";
-        std::wcout << L"Grade: " << report.grade << L"\n";
-        std::wcout << L"Summary: " << report.summary << L"\n";
+        std::cout << "=== Product Exterior Inspection Report ===\n";
+        std::cout << "Final score: " << std::fixed << std::setprecision(1) << report.score << "\n";
+        std::cout << "Grade: " << report.grade << "\n";
+        std::cout << "Summary: " << report.summary << "\n";
 
         if (report.detectedIssues.empty())
         {
-            std::wcout << L"Detected issues: none\n";
+            std::cout << "Detected issues: none\n";
             return;
         }
 
-        std::wcout << L"Detected issues:\n";
+        std::cout << "Detected issues:\n";
         for (const auto& issue : report.detectedIssues)
         {
-            std::wcout << L"- " << issue << L"\n";
+            std::cout << "- " << issue << "\n";
+
 
         }
     }
 
     ImageInspectionMetrics BuildSampleMetrics()
     {
-        return ImageInspectionMetrics{
-            .scratchSeverity = 0.35,
-            .stainSeverity = 0.20,
-            .discolorationSeverity = 0.15,
-            .edgeDamageSeverity = 0.40,
-            .shapeDeformationSeverity = 0.10,
-            .analysisConfidence = 0.88,
-            .detectedIssues = {L"Light scratches on the front surface", L"Wear on the lower-right corner"}
-
+        ImageInspectionMetrics metrics;
+        metrics.scratchSeverity = 0.35;
+        metrics.stainSeverity = 0.20;
+        metrics.discolorationSeverity = 0.15;
+        metrics.edgeDamageSeverity = 0.40;
+        metrics.shapeDeformationSeverity = 0.10;
+        metrics.analysisConfidence = 0.88;
+        metrics.detectedIssues = {
+            "Light scratches on the front surface",
+            "Wear on the lower-right corner"
         };
+        return metrics;
+
     }
 }
 
 int main()
 {
-    InitializeConsole();
-
-    // TODO: OpenCV로 이미지에서 외관 지표를 추출한 뒤 BuildSampleMetrics 대신 실제 측정값을 연결합니다.
-    // TODO: OpenGL을 도입하면 손상 위치를 오버레이 시각화할 수 있습니다.
+    // TODO: Replace this sample with actual metrics extracted from product photos through OpenCV.
+    // TODO: Add OpenGL overlays later if you want to visualize damaged regions on top of the image.
     const ImageInspectionMetrics metrics = BuildSampleMetrics();
 
     const ProductIssueEvaluator evaluator;
