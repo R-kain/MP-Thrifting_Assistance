@@ -128,6 +128,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mp_TA.cpp" />
+    <ClCompile Include="ProductIssueEvaluator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InspectionTypes.h" />
+    <ClInclude Include="ProductIssueEvaluator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
