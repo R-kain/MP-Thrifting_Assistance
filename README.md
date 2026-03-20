@@ -37,3 +37,17 @@
 ## 참고
 
 아직 실제 OpenCV/OpenGL 라이브러리 연결은 하지 않았습니다. 현재 구조는 **의존성 연결 전에도 빌드 가능한 초기 골격**이며, 다음 단계에서 Visual Studio 프로젝트에 OpenCV/OpenGL include/lib 설정을 추가하면 됩니다.
+
+
+## 디렉터리 기반 실행
+
+현재 콘솔 프로그램은 실행 인자로 **이미지 디렉터리 경로**를 받습니다.
+
+```bash
+mp_TA.exe C:/images/products
+```
+
+- 지원 확장자: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`
+- 지정한 폴더 안의 이미지 파일을 순회하며 각 파일마다 리포트를 출력합니다.
+- 아직 OpenCV 분석은 연결되지 않아, 현재는 각 이미지에 대해 placeholder metric을 사용합니다.
+

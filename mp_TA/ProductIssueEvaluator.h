@@ -11,5 +11,4 @@ private:
     [[nodiscard]] static double Clamp(double value, double minValue, double maxValue);
     [[nodiscard]] static std::string CalculateGrade(double score);
     [[nodiscard]] static std::string BuildSummary(const ImageInspectionMetrics& metrics, double score);
-
 };
