@@ -1,5 +1,12 @@
 #include <iomanip>
 #include <iostream>
+#include <locale>
+
+
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 #include "ProductIssueEvaluator.h"
 
@@ -22,6 +29,8 @@ namespace
         for (const auto& issue : report.detectedIssues)
         {
             std::cout << "- " << issue << "\n";
+
+
         }
     }
 
@@ -39,6 +48,7 @@ namespace
             "Wear on the lower-right corner"
         };
         return metrics;
+
     }
 }
 
@@ -50,6 +60,7 @@ int main()
 
     const ProductIssueEvaluator evaluator;
     const ProductScoreReport report = evaluator.Evaluate(metrics);
+
 
     PrintReport(report);
     return 0;
