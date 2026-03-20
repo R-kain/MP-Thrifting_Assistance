@@ -50,3 +50,4 @@ mp_TA.exe C:/images/products
 - 지원 확장자: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`
 - 지정한 폴더 안의 이미지 파일을 순회하며 각 파일마다 리포트를 출력합니다.
 - 아직 OpenCV 분석은 연결되지 않아, 현재는 각 이미지에 대해 placeholder metric을 사용합니다.
+

@@ -1,3 +1,4 @@
+
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
@@ -84,6 +85,7 @@ namespace
         metrics.shapeDeformationSeverity = 0.10;
         metrics.analysisConfidence = 0.88;
         metrics.detectedIssues = {
+
             "Placeholder analysis for: " + imagePath.filename().string(),
             "Connect OpenCV image processing to replace these sample issues"
         };
@@ -130,5 +132,4 @@ int main(int argc, char* argv[])
         PrintReport(imagePath, report);
     }
 
-    return 0;
-}
+
