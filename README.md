@@ -1,4 +1,4 @@
-# MP Thrifting Assistance
+# Midea Project - Thrifting Assistance
 
 중고 상품 사진을 입력받아 외관상 문제점을 분석하고 점수를 산정하기 위한 C++ 프로젝트입니다.
 
