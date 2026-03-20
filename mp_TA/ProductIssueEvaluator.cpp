@@ -1,6 +1,8 @@
 #include "ProductIssueEvaluator.h"
 
 #include <algorithm>
+#include <iomanip>
+
 #include <sstream>
 
 namespace
@@ -19,48 +21,53 @@ double ProductIssueEvaluator::Clamp(double value, double minValue, double maxVal
     return std::clamp(value, minValue, maxValue);
 }
 
+
 std::string ProductIssueEvaluator::CalculateGrade(double score)
 {
     if (score >= 90.0)
     {
-        return "A";
+        return L"A";
     }
 
     if (score >= 75.0)
     {
-        return "B";
+        return L"B";
+
     }
 
     if (score >= 60.0)
     {
-        return "C";
+        return L"C";
     }
 
-    return "D";
+    return L"D";
 }
 
-std::string ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& metrics, double score)
+std::wstring ProductIssueEvaluator::BuildSummary(const ImageInspectionMetrics& metrics, double score)
 {
-    std::ostringstream stream;
-    stream << "외관 점수 " << score << "점. ";
+    std::wostringstream stream;
+    stream << std::fixed << std::setprecision(1);
+    stream << L"Appearance score: " << score << L". ";
 
     if (metrics.analysisConfidence < 0.4)
     {
-        stream << "분석 신뢰도가 낮아 추가 촬영이 필요합니다.";
+        stream << L"Analysis confidence is low, so more photos are recommended.";
+
         return stream.str();
     }
 
     if (metrics.scratchSeverity >= 0.6 || metrics.edgeDamageSeverity >= 0.6)
     {
-        stream << "표면 손상과 모서리 손상이 커서 감점 폭이 큽니다.";
+        stream << L"Surface scratches and edge damage are the main reasons for the score reduction.";
     }
     else if (metrics.stainSeverity >= 0.5 || metrics.discolorationSeverity >= 0.5)
     {
-        stream << "오염 또는 변색이 주된 품질 저하 요인입니다.";
+        stream << L"Stains or discoloration are the main factors lowering the quality score.";
     }
     else
     {
-        stream << "전반적인 상태가 양호합니다.";
+        stream << L"The overall exterior condition looks good.";
+
     }
 
     return stream.str();
