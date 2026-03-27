@@ -1,4 +1,5 @@
-# MP Thrifting Assistance
+
+# Midea Project - Thrifting Assistance
 
 중고 상품 사진을 입력받아 외관상 문제점을 분석하고 점수를 산정하기 위한 C++ 프로젝트입니다.
 
@@ -59,3 +60,4 @@ OpenCV 헤더/라이브러리가 연결된 빌드에서는 각 이미지 처리 
 - 현재는 실제 결함 검출 대신 placeholder 영역을 생성해 강조합니다.
 - 추후 OpenCV 결함 검출 결과를 `BuildPlaceholderDefectRegions` 위치에 연결하면 실제 탐지 영역 시각화로 전환할 수 있습니다.
 - OpenCV가 없는 환경에서는 창 출력 로직이 자동으로 비활성화되고, 콘솔 메시지로만 안내합니다.
+

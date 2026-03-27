@@ -15,6 +15,7 @@
 #define MP_TA_HAS_OPENCV 0
 #endif
 
+
 #include "ProductIssueEvaluator.h"
 
 namespace
@@ -157,7 +158,6 @@ namespace
         std::cout << "[OpenCV unavailable] Skipping visualization window for: " << imagePath.filename().string() << "\n";
     }
 #endif
-
     void PrintUsage(const char* executableName)
     {
         std::cout << "Usage: " << executableName << " <image_directory>\n";
@@ -210,3 +210,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
