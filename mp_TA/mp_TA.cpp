@@ -131,5 +131,5 @@ int main(int argc, char* argv[])
         const ProductScoreReport report = evaluator.Evaluate(metrics);
         PrintReport(imagePath, report);
     }
-
+}
 
