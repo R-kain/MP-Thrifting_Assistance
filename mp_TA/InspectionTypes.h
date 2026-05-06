@@ -3,6 +3,16 @@
 #include <string>
 #include <vector>
 
+struct InspectionRegion
+{
+    double x = 0.0;
+    double y = 0.0;
+    double width = 0.0;
+    double height = 0.0;
+    double confidence = 0.0;
+    std::string label;
+};
+
 struct ImageInspectionMetrics
 {
     double scratchSeverity = 0.0;
@@ -12,6 +22,7 @@ struct ImageInspectionMetrics
     double shapeDeformationSeverity = 0.0;
     double analysisConfidence = 0.0;
     std::vector<std::string> detectedIssues;
+    std::vector<InspectionRegion> suspectedScratchRegions;
 };
 
 struct ProductScoreReport
