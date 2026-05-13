@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
+    <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{5F8A3C1A-8E24-4A9A-9C8B-0A55B17A5C42}</ProjectGuid>
+    <ProjectGuid>{64a2398c-4819-4d2b-97b9-9bf4c75429cc}</ProjectGuid>
     <RootNamespace>mpTA</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

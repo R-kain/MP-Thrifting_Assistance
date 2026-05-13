@@ -129,9 +129,18 @@ namespace mpTA
         Button^ analyzeButton;
         CheckBox^ showOverlayCheckBox;
         TextBox^ outputTextBox;
+        String^ pathPlaceholderText;
+        array<String^>^ selectedInputPaths;
+        bool isPathPlaceholderVisible;
+        bool suppressPathTextChange;
 
         void InitializeComponent()
         {
+            pathPlaceholderText = "Drag image files/folders here or click Browse";
+            selectedInputPaths = nullptr;
+            isPathPlaceholderVisible = false;
+            suppressPathTextChange = false;
+
             Text = "mp_TA Product Inspection";
             StartPosition = FormStartPosition::CenterScreen;
             MinimumSize = System::Drawing::Size(780, 520);
@@ -154,7 +163,7 @@ namespace mpTA
             Controls->Add(root);
 
             auto titleLabel = gcnew Label();
-            titleLabel->Text = "Image inspection - drag image files or folders onto this window";
+            titleLabel->Text = "Image inspection";
             titleLabel->Dock = DockStyle::Fill;
             titleLabel->Font = gcnew Drawing::Font("Segoe UI", 11.0f, FontStyle::Bold);
             titleLabel->TextAlign = ContentAlignment::MiddleLeft;
@@ -183,6 +192,9 @@ namespace mpTA
             directoryTextBox->AllowDrop = true;
             directoryTextBox->DragEnter += gcnew DragEventHandler(this, &MainForm::MainForm_DragEnter);
             directoryTextBox->DragDrop += gcnew DragEventHandler(this, &MainForm::MainForm_DragDrop);
+            directoryTextBox->Enter += gcnew EventHandler(this, &MainForm::DirectoryTextBox_Enter);
+            directoryTextBox->Leave += gcnew EventHandler(this, &MainForm::DirectoryTextBox_Leave);
+            directoryTextBox->TextChanged += gcnew EventHandler(this, &MainForm::DirectoryTextBox_TextChanged);
             inputPanel->Controls->Add(directoryTextBox, 0, 0);
 
             browseButton = gcnew Button();
@@ -217,6 +229,8 @@ namespace mpTA
             outputTextBox->DragEnter += gcnew DragEventHandler(this, &MainForm::MainForm_DragEnter);
             outputTextBox->DragDrop += gcnew DragEventHandler(this, &MainForm::MainForm_DragDrop);
             root->Controls->Add(outputTextBox, 0, 2);
+
+            ShowPathPlaceholder();
         }
 
         void BrowseButton_Click(Object^ sender, EventArgs^ e)
@@ -224,17 +238,42 @@ namespace mpTA
             (void)sender;
             (void)e;
 
-            auto dialog = gcnew FolderBrowserDialog();
-            dialog->Description = "Select image directory";
+            auto dialog = gcnew OpenFileDialog();
+            dialog->Title = "Select image file";
+            dialog->Filter = "Image files (*.jpg;*.jpeg;*.png;*.bmp;*.webp)|*.jpg;*.jpeg;*.png;*.bmp;*.webp|All files (*.*)|*.*";
+            dialog->Multiselect = true;
+            dialog->CheckFileExists = true;
+            dialog->RestoreDirectory = true;
 
-            if (!String::IsNullOrWhiteSpace(directoryTextBox->Text) && System::IO::Directory::Exists(directoryTextBox->Text))
+            String^ currentPath = GetActualInputText();
+            if (!String::IsNullOrWhiteSpace(currentPath))
             {
-                dialog->SelectedPath = directoryTextBox->Text;
+                if (System::IO::Directory::Exists(currentPath))
+                {
+                    dialog->InitialDirectory = currentPath;
+                }
+                else if (System::IO::File::Exists(currentPath))
+                {
+                    dialog->InitialDirectory = System::IO::Path::GetDirectoryName(currentPath);
+                }
             }
 
             if (dialog->ShowDialog(this) == Windows::Forms::DialogResult::OK)
             {
-                directoryTextBox->Text = dialog->SelectedPath;
+                selectedInputPaths = dialog->FileNames;
+                std::vector<fs::path> imageFiles = BuildImageListFromDrop(selectedInputPaths);
+                outputTextBox->Clear();
+
+                if (imageFiles.empty())
+                {
+                    SetInputText("");
+                    ShowPathPlaceholder();
+                    AppendLine("Selected files did not include supported images.");
+                    return;
+                }
+
+                SetInputText(BuildSelectionDisplayText(selectedInputPaths, imageFiles));
+                AnalyzeImageFiles(imageFiles, String::Format("file selection: {0} image file(s)", static_cast<int>(imageFiles.size())));
             }
         }
 
@@ -244,20 +283,67 @@ namespace mpTA
             (void)e;
 
             outputTextBox->Clear();
-            const fs::path imageDirectory = ToNativePath(directoryTextBox->Text);
-            if (imageDirectory.empty())
+            if (selectedInputPaths != nullptr)
+            {
+                std::vector<fs::path> imageFiles = BuildImageListFromDrop(selectedInputPaths);
+                if (!imageFiles.empty())
+                {
+                    AnalyzeImageFiles(imageFiles, String::Format("file selection: {0} image file(s)", static_cast<int>(imageFiles.size())));
+                    return;
+                }
+
+                selectedInputPaths = nullptr;
+            }
+
+            const fs::path inputPath = ToNativePath(GetActualInputText());
+            if (inputPath.empty())
             {
                 AppendLine("Select an image directory first, or drag image files onto this window.");
                 return;
             }
 
-            if (!fs::exists(imageDirectory) || !fs::is_directory(imageDirectory))
+            if (fs::is_regular_file(inputPath) && IsSupportedImageFile(inputPath))
             {
-                AppendLine("The specified path is not a valid directory: " + ToManagedString(imageDirectory));
+                AnalyzeImageFiles({ inputPath }, "file: " + ToManagedString(inputPath));
                 return;
             }
 
-            AnalyzeImageFiles(CollectImageFiles(imageDirectory), "directory: " + ToManagedString(imageDirectory));
+            if (!fs::exists(inputPath) || !fs::is_directory(inputPath))
+            {
+                AppendLine("The specified path is not a valid image file or directory: " + ToManagedString(inputPath));
+                return;
+            }
+
+            AnalyzeImageFiles(CollectImageFiles(inputPath), "directory: " + ToManagedString(inputPath));
+        }
+
+        void DirectoryTextBox_Enter(Object^ sender, EventArgs^ e)
+        {
+            (void)sender;
+            (void)e;
+            ClearPathPlaceholder();
+        }
+
+        void DirectoryTextBox_Leave(Object^ sender, EventArgs^ e)
+        {
+            (void)sender;
+            (void)e;
+
+            if (String::IsNullOrWhiteSpace(directoryTextBox->Text))
+            {
+                ShowPathPlaceholder();
+            }
+        }
+
+        void DirectoryTextBox_TextChanged(Object^ sender, EventArgs^ e)
+        {
+            (void)sender;
+            (void)e;
+
+            if (!suppressPathTextChange && !isPathPlaceholderVisible)
+            {
+                selectedInputPaths = nullptr;
+            }
         }
 
         void MainForm_DragEnter(Object^ sender, DragEventArgs^ e)
@@ -288,7 +374,8 @@ namespace mpTA
                 return;
             }
 
-            directoryTextBox->Text = BuildDropDisplayText(paths, imageFiles);
+            selectedInputPaths = paths;
+            SetInputText(BuildSelectionDisplayText(paths, imageFiles));
             AnalyzeImageFiles(imageFiles, String::Format("drag-and-drop selection: {0} image file(s)", static_cast<int>(imageFiles.size())));
         }
 
@@ -319,14 +406,56 @@ namespace mpTA
             return imageFiles;
         }
 
-        String^ BuildDropDisplayText(array<String^>^ paths, const std::vector<fs::path>& imageFiles)
+        String^ BuildSelectionDisplayText(array<String^>^ paths, const std::vector<fs::path>& imageFiles)
         {
             if (paths != nullptr && paths->Length == 1)
             {
                 return paths[0];
             }
 
-            return String::Format("{0} dropped image file(s)", static_cast<int>(imageFiles.size()));
+            return String::Format("{0} selected image file(s)", static_cast<int>(imageFiles.size()));
+        }
+
+        String^ GetActualInputText()
+        {
+            if (isPathPlaceholderVisible)
+            {
+                return "";
+            }
+
+            return directoryTextBox->Text;
+        }
+
+        void SetInputText(String^ text)
+        {
+            suppressPathTextChange = true;
+            isPathPlaceholderVisible = false;
+            directoryTextBox->ForeColor = SystemColors::WindowText;
+            directoryTextBox->Text = text;
+            suppressPathTextChange = false;
+        }
+
+        void ShowPathPlaceholder()
+        {
+            suppressPathTextChange = true;
+            isPathPlaceholderVisible = true;
+            directoryTextBox->ForeColor = SystemColors::GrayText;
+            directoryTextBox->Text = pathPlaceholderText;
+            suppressPathTextChange = false;
+        }
+
+        void ClearPathPlaceholder()
+        {
+            if (!isPathPlaceholderVisible)
+            {
+                return;
+            }
+
+            suppressPathTextChange = true;
+            isPathPlaceholderVisible = false;
+            directoryTextBox->ForeColor = SystemColors::WindowText;
+            directoryTextBox->Clear();
+            suppressPathTextChange = false;
         }
 
         void AnalyzeImageFiles(const std::vector<fs::path>& imageFiles, String^ sourceLabel)

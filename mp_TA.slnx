@@ -1,7 +1,6 @@
 <Solution>
   <Configurations>
     <Platform Name="x64" />
-    <Platform Name="x86" />
   </Configurations>
   <Project Path="mp_TA/mp_TA.vcxproj" Id="5f8a3c1a-8e24-4a9a-9c8b-0a55b17a5c42" />
 </Solution>
